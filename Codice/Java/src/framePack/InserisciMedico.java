@@ -94,6 +94,8 @@ public class InserisciMedico extends JFrame{
 		add(mainPanel);
 		setVisible(true);
 		setSize(400,400);
+		setTitle("Insersci Medico");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	

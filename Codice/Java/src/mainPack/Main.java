@@ -12,7 +12,7 @@ public class Main {
 
 			String url = "jdbc:mysql://localhost:3306/scuolecalcioDB?serverTimezone=UTC";
 
-			Connection con = DriverManager.getConnection(url, "root", "root");
+			Connection con = DriverManager.getConnection(url, "utente", "password");
 			
 			MyFrame mf = new MyFrame(con);
 			mf.setVisible(true);

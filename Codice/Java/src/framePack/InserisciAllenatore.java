@@ -112,8 +112,8 @@ public class InserisciAllenatore extends JFrame {
 		add(mainPanel);
 		setVisible(true);
 		setSize(600,600);
-		setTitle("Iscrivi Bambino");
-				
+		setTitle("Inserisci Allenatore");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	

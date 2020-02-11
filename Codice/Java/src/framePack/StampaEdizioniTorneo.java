@@ -14,24 +14,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class StampaBimbiSquadra extends JFrame{
+public class StampaEdizioniTorneo extends JFrame {
 
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4814082018157684136L;
+	private static final long serialVersionUID = 7013729425827524682L;
 
-	public StampaBimbiSquadra(Connection con) {
+	public StampaEdizioniTorneo(Connection con) {
 		
-		JPanel mainPanel = new JPanel(new GridLayout(3,1));
+JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		
 		JPanel sceltaPanel = new JPanel(new GridLayout(2,1));
 		
-		JLabel sceltaLabel = new JLabel("Scegli squadra:");
+		JLabel sceltaLabel = new JLabel("Scegli torneo:");
 		sceltaPanel.add(sceltaLabel);
 		
 		JComboBox<String> tendina = new JComboBox<String>();
-		String sql2 = " SELECT nome FROM squadra";
+		String sql2 = " SELECT DISTINCT nome FROM torneo";
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql2);
@@ -48,15 +49,13 @@ public class StampaBimbiSquadra extends JFrame{
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
-					"FROM squadra, bambino " + 
-					"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
+			String cercaBambini = "select edizione, squadra from torneo where torneo.nome=?";
 			try {
 				PreparedStatement st1 = con.prepareStatement(cercaBambini);
 				st1.setString(1, (String)tendina.getSelectedItem());
 				ResultSet rs = st1.executeQuery();
 				while(rs.next()) {
-					ta.append(rs.getString(1) + " " + rs.getInt(2) + "\n");
+					ta.append(rs.getInt(1) + " - " + rs.getString(2) + "\n");
 				}
 			}
 			catch(Exception e1) {
@@ -71,7 +70,7 @@ public class StampaBimbiSquadra extends JFrame{
 		add(mainPanel);
 		setSize(400,400);
 		setVisible(true);
-		setTitle("Stampa bimbi di una squadra");
+		setTitle("Stampa edizioni torneo");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}

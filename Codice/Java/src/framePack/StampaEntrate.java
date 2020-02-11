@@ -66,6 +66,8 @@ public class StampaEntrate extends JFrame{
 		add(mainPanel);
 		setSize(400,400);
 		setVisible(true);
+		setTitle("Stampa Entrate");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	

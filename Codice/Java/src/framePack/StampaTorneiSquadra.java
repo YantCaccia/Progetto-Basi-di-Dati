@@ -14,14 +14,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class StampaBimbiSquadra extends JFrame{
+public class StampaTorneiSquadra extends JFrame{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4814082018157684136L;
-
-	public StampaBimbiSquadra(Connection con) {
+	private static final long serialVersionUID = 6337498573961009375L;
+	
+	public StampaTorneiSquadra(Connection con) {
 		
 		JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		
@@ -48,15 +48,15 @@ public class StampaBimbiSquadra extends JFrame{
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
-					"FROM squadra, bambino " + 
-					"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
+			String cercaTornei = "SELECT torneo.nome, edizione, premio " + 
+					"FROM squadra, torneo " + 
+					"WHERE torneo.squadra=squadra.nome && squadra.nome=?";
 			try {
-				PreparedStatement st1 = con.prepareStatement(cercaBambini);
+				PreparedStatement st1 = con.prepareStatement(cercaTornei);
 				st1.setString(1, (String)tendina.getSelectedItem());
 				ResultSet rs = st1.executeQuery();
 				while(rs.next()) {
-					ta.append(rs.getString(1) + " " + rs.getInt(2) + "\n");
+					ta.append(rs.getString(1) + " " + rs.getInt(2) + " " + rs.getString(3) + "\n");
 				}
 			}
 			catch(Exception e1) {
@@ -71,10 +71,9 @@ public class StampaBimbiSquadra extends JFrame{
 		add(mainPanel);
 		setSize(400,400);
 		setVisible(true);
-		setTitle("Stampa bimbi di una squadra");
+		setTitle("Stampa tornei di una squadra");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
-	
-	
+
 }

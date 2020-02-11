@@ -1,4 +1,4 @@
-package framePack;
+package mainPack;
 
 import java.awt.GridLayout;
 import java.sql.Connection;
@@ -11,32 +11,33 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class StampaBimbiSquadra extends JFrame{
+public class StampaNumeroFatture extends JFrame {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4814082018157684136L;
+	private static final long serialVersionUID = 3419574431452648144L;
 
-	public StampaBimbiSquadra(Connection con) {
+	public StampaNumeroFatture(Connection con) {
 		
-		JPanel mainPanel = new JPanel(new GridLayout(3,1));
+		JPanel mainPanel = new JPanel(new GridLayout(2,1));
 		
 		JPanel sceltaPanel = new JPanel(new GridLayout(2,1));
 		
-		JLabel sceltaLabel = new JLabel("Scegli squadra:");
+		JLabel sceltaLabel = new JLabel("Scegli scuola calcio:");
 		sceltaPanel.add(sceltaLabel);
 		
 		JComboBox<String> tendina = new JComboBox<String>();
-		String sql2 = " SELECT nome FROM squadra";
+		String sql2 = " SELECT partitaIva, nome FROM scuolacalcio";
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql2);
 			while(rs.next()) {
-				tendina.addItem(rs.getString(1));
+				tendina.addItem(rs.getString(1) + " - " + rs.getString(2));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -47,16 +48,18 @@ public class StampaBimbiSquadra extends JFrame{
 		
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
-			ta.setText("");
-			String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
-					"FROM squadra, bambino " + 
-					"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
+			//Prendo la partitaIva della squadra
+			String str = (String) tendina.getSelectedItem();
+			String[] arr = str.split(" ", 2);
+			String pIva = arr[0];
+			//Cerco il numero della scuola calcio
+			String cercaScuolaCalcio = "select nFattureEmesse from scuolacalcio where scuolacalcio.partitaIva=?";
 			try {
-				PreparedStatement st1 = con.prepareStatement(cercaBambini);
-				st1.setString(1, (String)tendina.getSelectedItem());
+				PreparedStatement st1 = con.prepareStatement(cercaScuolaCalcio);
+				st1.setString(1, pIva);
 				ResultSet rs = st1.executeQuery();
 				while(rs.next()) {
-					ta.append(rs.getString(1) + " " + rs.getInt(2) + "\n");
+					JOptionPane.showMessageDialog(null, (rs.getInt(1)));
 				}
 			}
 			catch(Exception e1) {
@@ -71,10 +74,11 @@ public class StampaBimbiSquadra extends JFrame{
 		add(mainPanel);
 		setSize(400,400);
 		setVisible(true);
-		setTitle("Stampa bimbi di una squadra");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("Stampa numero fatture");
 		
 	}
+	
+	
 	
 	
 }

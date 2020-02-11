@@ -175,9 +175,7 @@ public class IscriviBambinoFrame extends JFrame{
 			}
 			catch (Exception e2) {
 				e2.getStackTrace();
-			}
-			
-			
+			}			
 			dispose();
 		});
 		mainPanel.add(okButton);
@@ -186,6 +184,7 @@ public class IscriviBambinoFrame extends JFrame{
 		setVisible(true);
 		setSize(600,600);
 		setTitle("Iscrivi Bambino");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	
