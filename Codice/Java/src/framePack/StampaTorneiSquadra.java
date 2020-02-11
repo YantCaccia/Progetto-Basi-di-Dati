@@ -48,7 +48,16 @@ public class StampaTorneiSquadra extends JFrame{
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String cercaTornei = "SELECT torneo.nome, edizione, premio " + 
+			String nome = (String)tendina.getSelectedItem();
+			ResultSet rs = executeSQL(con, nome);
+			try {
+				while(rs.next()) {
+					ta.append(rs.getString(1) + " " + rs.getInt(2) + " " + rs.getString(3) + "\n");
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			/*String cercaTornei = "SELECT torneo.nome, edizione, premio " + 
 					"FROM squadra, torneo " + 
 					"WHERE torneo.squadra=squadra.nome && squadra.nome=?";
 			try {
@@ -61,7 +70,7 @@ public class StampaTorneiSquadra extends JFrame{
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -76,4 +85,20 @@ public class StampaTorneiSquadra extends JFrame{
 		
 	}
 
+	public static ResultSet executeSQL(Connection con, String nome) {
+		ResultSet rs = null;
+		String cercaTornei = "SELECT torneo.nome, edizione, premio " + 
+				"FROM squadra, torneo " + 
+				"WHERE torneo.squadra=squadra.nome && squadra.nome=?";
+		try {
+			PreparedStatement st1 = con.prepareStatement(cercaTornei);
+			st1.setString(1, nome);
+			rs = st1.executeQuery();
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
+	}
+	
 }

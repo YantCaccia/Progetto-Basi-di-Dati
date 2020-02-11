@@ -65,16 +65,21 @@ public class InserisciSquadra extends JFrame{
 			try {
 				String nomecognome = (String) allenatore.getSelectedItem();
 				String[] arr = nomecognome.split(" ", 2);
-				String nome = arr[0];
-				String cognome = arr[1];
+				String nomeAll = arr[0];
+				String cognomeAll = arr[1];
 				//Cerco il codice fiscale dell'allenatore
 				String cercaAll = "SELECT codFis FROM dipendenti WHERE nome=? && cognome=?";
 				PreparedStatement st = con.prepareStatement(cercaAll);
-				st.setString(1, nome);
-				st.setString(2, cognome);
+				st.setString(1, nomeAll);
+				st.setString(2, cognomeAll);
 				ResultSet rs = st.executeQuery();
 				rs.next();
-				String codFisAll = rs.getString(1);				
+				String codFisAll = rs.getString(1);
+				String nome = nomefield.getText();
+				int eta = Integer.parseInt(etafield.getText());
+				String categoria = catfield.getText();
+				executeSQL(con, nome, eta, categoria, codFisAll);
+				/*
 				//Creo la nuova squadra
 				String creaSq = "INSERT INTO squadra VALUES (?,?,?,?);";
 				PreparedStatement st1 = con.prepareStatement(creaSq);
@@ -82,7 +87,7 @@ public class InserisciSquadra extends JFrame{
 				st1.setInt(2, Integer.parseInt(etafield.getText()));
 				st1.setString(3, catfield.getText());
 				st1.setString(4, codFisAll);
-				st1.executeUpdate();
+				st1.executeUpdate();*/
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
@@ -96,7 +101,24 @@ public class InserisciSquadra extends JFrame{
 		setSize(600,600);
 		setTitle("Inserisci Squadra");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				
+
+	}
+	
+	public static void executeSQL(Connection con, String nome, int eta, String categoria, String codFisAll) {
+		try {
+			//Creo la nuova squadra
+			String creaSq = "INSERT INTO squadra VALUES (?,?,?,?);";
+			PreparedStatement st1 = con.prepareStatement(creaSq);
+			st1.setString(1, nome);
+			st1.setInt(2, eta);
+			st1.setString(3, categoria);
+			st1.setString(4, codFisAll);
+			st1.executeUpdate();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 		
 	}
+	
+	
 }

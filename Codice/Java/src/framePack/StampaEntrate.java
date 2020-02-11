@@ -45,7 +45,16 @@ public class StampaEntrate extends JFrame{
 		
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
-			String creaDip = "SELECT SUM(importo) " + 
+			String nome = (String)tendina.getSelectedItem();
+			ResultSet rs = executeSQL(con, nome);
+			try {
+				rs.next();
+				JOptionPane.showMessageDialog(null, "Entrate: " + Integer.toString(rs.getInt(1)) + "$");
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			/*String creaDip = "SELECT SUM(importo) " + 
 					"FROM scuolacalcio, bambino, retta " + 
 					"WHERE scuolacalcio.partitaIva=bambino.scuolacalcio && retta.bambino=bambino.codFis && scuolacalcio.nome=?";
 			try {
@@ -57,7 +66,7 @@ public class StampaEntrate extends JFrame{
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -71,5 +80,20 @@ public class StampaEntrate extends JFrame{
 		
 	}
 	
+	public static ResultSet executeSQL(Connection con, String nome) {
+		ResultSet rs = null;
+		String creaDip = "SELECT SUM(importo) " + 
+				"FROM scuolacalcio, bambino, retta " + 
+				"WHERE scuolacalcio.partitaIva=bambino.scuolacalcio && retta.bambino=bambino.codFis && scuolacalcio.nome=?";
+		try {
+			PreparedStatement st1 = con.prepareStatement(creaDip);
+			st1.setString(1, nome);
+			rs = st1.executeQuery();
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
+	}
 	
 }

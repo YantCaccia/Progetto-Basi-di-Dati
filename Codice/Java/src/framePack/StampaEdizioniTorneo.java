@@ -24,7 +24,7 @@ public class StampaEdizioniTorneo extends JFrame {
 
 	public StampaEdizioniTorneo(Connection con) {
 		
-JPanel mainPanel = new JPanel(new GridLayout(3,1));
+		JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		
 		JPanel sceltaPanel = new JPanel(new GridLayout(2,1));
 		
@@ -49,7 +49,16 @@ JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String cercaBambini = "select edizione, squadra from torneo where torneo.nome=?";
+			String nome = (String)tendina.getSelectedItem();
+			ResultSet rs = executeSQL(con, nome);
+			try {
+				while(rs.next()) {
+					ta.append(rs.getInt(1) + " - " + rs.getString(2) + "\n");
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			/*String cercaBambini = "select edizione, squadra from torneo where torneo.nome=?";
 			try {
 				PreparedStatement st1 = con.prepareStatement(cercaBambini);
 				st1.setString(1, (String)tendina.getSelectedItem());
@@ -60,7 +69,7 @@ JPanel mainPanel = new JPanel(new GridLayout(3,1));
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -73,6 +82,20 @@ JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		setTitle("Stampa edizioni torneo");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+	}
+	
+	public static ResultSet executeSQL(Connection con, String nome) {
+		ResultSet rs = null;
+		String cercaBambini = "select edizione, squadra from torneo where torneo.nome=?";
+		try {
+			PreparedStatement st1 = con.prepareStatement(cercaBambini);
+			st1.setString(1, nome);
+			rs = st1.executeQuery();
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
 	}
 	
 	

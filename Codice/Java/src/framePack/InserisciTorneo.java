@@ -49,23 +49,27 @@ public class InserisciTorneo extends JFrame{
 		premiopanel.add(premiofield);
 		mainPanel.add(premiopanel);
 		
-		JComboBox<String> squadra = new JComboBox<String>();
+		JComboBox<String> squadraTendina = new JComboBox<String>();
 		String sql2 = " SELECT nome FROM squadra";
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql2);
 			while(rs.next()) {
-				squadra.addItem(rs.getString(1));
+				squadraTendina.addItem(rs.getString(1));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		mainPanel.add(squadra);
+		mainPanel.add(squadraTendina);
 		
 		JButton okButton = new JButton("Ok");
 		okButton.addActionListener(e->{
-			
-			try {				
+			String nome = nomefield.getText();
+			int edizione = Integer.parseInt(edfield.getText());
+			String premio = premiofield.getText();
+			String squadra = (String)squadraTendina.getSelectedItem();
+			executeSQL(con, nome, edizione, premio, squadra);
+			/*try {				
 				//Creo il torneo
 				String creaAll = "INSERT INTO torneo VALUES(?,?,?,?)";
 				PreparedStatement st2 = con.prepareStatement(creaAll);
@@ -76,7 +80,7 @@ public class InserisciTorneo extends JFrame{
 				st2.executeUpdate();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
-			}
+			}*/
 						
 			dispose();
 		});
@@ -89,6 +93,19 @@ public class InserisciTorneo extends JFrame{
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
-	
+	public static void executeSQL(Connection con, String nome, int edizione, String premio, String squadra) {
+		try {				
+			//Creo il torneo
+			String creaAll = "INSERT INTO torneo VALUES(?,?,?,?)";
+			PreparedStatement st2 = con.prepareStatement(creaAll);
+			st2.setString(1, nome);
+			st2.setInt(2, edizione);
+			st2.setString(3, premio);
+			st2.setString(4, squadra);
+			st2.executeUpdate();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
 	
 }

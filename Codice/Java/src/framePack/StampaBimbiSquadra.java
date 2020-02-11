@@ -48,7 +48,16 @@ public class StampaBimbiSquadra extends JFrame{
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
+			String squadra = (String)tendina.getSelectedItem();
+			ResultSet rs = executeSQL(con, squadra);
+			try {
+				while(rs.next()) {
+					ta.append(rs.getString(1) + " " + rs.getInt(2) + "\n");
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			/*String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
 					"FROM squadra, bambino " + 
 					"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
 			try {
@@ -61,7 +70,7 @@ public class StampaBimbiSquadra extends JFrame{
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -76,5 +85,19 @@ public class StampaBimbiSquadra extends JFrame{
 		
 	}
 	
-	
+	public static ResultSet executeSQL(Connection con, String squadra) {
+		ResultSet rs = null;
+		String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
+				"FROM squadra, bambino " + 
+				"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
+		try {
+			PreparedStatement st1 = con.prepareStatement(cercaBambini);
+			st1.setString(1, squadra);
+			rs = st1.executeQuery();
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
+	}
 }

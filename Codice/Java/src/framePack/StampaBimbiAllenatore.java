@@ -49,11 +49,16 @@ public class StampaBimbiAllenatore extends JFrame{
 			String[] arr = nomecognome.split(" ", 2);
 			String nome = arr[0];
 			String cognome = arr[1];
-			
-			String query = "SELECT COUNT(*) FROM allenatore,dipendenti,squadra,bambino WHERE allenatore.dipendente=dipendenti.codFis &&"
+			ResultSet rs = executeSQL(con, nome, cognome);
+			try {
+				rs.next();
+				JOptionPane.showMessageDialog(null, (Integer.toString(rs.getInt(1))));
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			/*String query = "SELECT COUNT(*) FROM allenatore,dipendenti,squadra,bambino WHERE allenatore.dipendente=dipendenti.codFis &&"
 					+ "squadra.allenatore=allenatore.dipendente &&"
 					+ " bambino.squadra=squadra.nome && dipendenti.nome=? && dipendenti.cognome=?";
-			
 			try {
 				PreparedStatement st = con.prepareStatement(query);
 				st.setString(1, nome);
@@ -64,11 +69,10 @@ public class StampaBimbiAllenatore extends JFrame{
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 			
 		});
-		
-		
+			
 		mainPanel.add(tendina);
 		mainPanel.add(ok);
 		add(mainPanel);
@@ -76,7 +80,24 @@ public class StampaBimbiAllenatore extends JFrame{
 		setSize(500,500);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
+	
+	}
+	
+	public static ResultSet executeSQL(Connection con, String nome, String cognome) {
+		ResultSet rs = null;
+		String query = "SELECT COUNT(*) FROM allenatore,dipendenti,squadra,bambino WHERE allenatore.dipendente=dipendenti.codFis &&"
+				+ "squadra.allenatore=allenatore.dipendente &&"
+				+ " bambino.squadra=squadra.nome && dipendenti.nome=? && dipendenti.cognome=?";
+		try {
+			PreparedStatement st = con.prepareStatement(query);
+			st.setString(1, nome);
+			st.setString(2, cognome);
+			rs = st.executeQuery();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return rs;
 	}
 	
 }

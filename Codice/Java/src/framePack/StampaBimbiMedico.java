@@ -59,8 +59,16 @@ JPanel mainPanel = new JPanel(new GridLayout(2,1));
 			catch(Exception e1) {
 				e1.printStackTrace();
 			}
+			ResultSet rs = executeSQL(con, codFis);
+			try {
+				rs.next();
+				JOptionPane.showMessageDialog(null, "Numero bambini: " + Integer.toString(rs.getInt(1)));
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			//trovo numero dei bambini
-			String cercanumero = "select count(*) " + 
+			/*String cercanumero = "select count(*) " + 
 					"from medicoSportivo, visita " + 
 					"where visita.medico=medicoSportivo.codFis && medicoSportivo.codFis=?";
 			try {
@@ -72,7 +80,7 @@ JPanel mainPanel = new JPanel(new GridLayout(2,1));
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -84,6 +92,23 @@ JPanel mainPanel = new JPanel(new GridLayout(2,1));
 		setTitle("Stampa numero bambini per un medico");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		
 		
+	}
+	
+	public static ResultSet executeSQL(Connection con, String codFis) {
+		ResultSet rs = null;
+		String cercanumero = "select count(*) " + 
+				"from medicoSportivo, visita " + 
+				"where visita.medico=medicoSportivo.codFis && medicoSportivo.codFis=?";
+		try {
+			PreparedStatement st1 = con.prepareStatement(cercanumero);
+			st1.setString(1, codFis);
+			rs = st1.executeQuery();
+			
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
 	}
 
 }

@@ -91,7 +91,11 @@ public class IscriviBambinoFrame extends JFrame{
 			String codFis = codfisfield.getText();
 			int eta = Integer.parseInt(etafield.getText());
 			String squadra = sqfield.getText();
-			String scuolacalcio = "Recca";
+			String scuolacalcio = scfield.getText();
+			int importoRetta = Integer.parseInt(rettafield.getText());
+			boolean annuale = true;
+			if(b2.isSelected()) annuale = false;
+			int sconto = Integer.parseInt(scontofield.getText());
 			String pIva = null;
 			//Abbiamo il nome della scuola calcio, ma ci serve la partita Iva. Prendiamola:
 			/**/
@@ -106,7 +110,9 @@ public class IscriviBambinoFrame extends JFrame{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			/**/
+			executeSQL(con, codFis, nome, eta, pIva, squadra, importoRetta, sconto, annuale);
+			
+			/*
 			try {
 				String creaBimbo = "INSERT INTO bambino VALUES(?, ?, ?, ?, ?)";
 				PreparedStatement st = con.prepareStatement(creaBimbo);
@@ -175,7 +181,7 @@ public class IscriviBambinoFrame extends JFrame{
 			}
 			catch (Exception e2) {
 				e2.getStackTrace();
-			}			
+			}*/
 			dispose();
 		});
 		mainPanel.add(okButton);
@@ -188,6 +194,79 @@ public class IscriviBambinoFrame extends JFrame{
 		
 	}
 	
-	
+	public static void executeSQL(Connection con, String codFis, String nome, int eta, String pIva, String squadra, int importoRetta, int sconto, boolean annuale) {
+		
+		try {
+			String creaBimbo = "INSERT INTO bambino VALUES(?, ?, ?, ?, ?)";
+			PreparedStatement st = con.prepareStatement(creaBimbo);
+			st.setString(1, codFis);
+			st.setString(2, nome);
+			st.setInt(3, eta);
+			st.setString(4, pIva);
+			st.setString(5, squadra);
+			st.executeUpdate();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//Crea una retta e incrementa numero fatture emesse
+		try {
+			String creaRetta = "INSERT INTO retta(importo, bambino) VALUES(?, ?)";
+			PreparedStatement st = con.prepareStatement(creaRetta);
+			st.setInt(1, importoRetta);
+			st.setString(2, codFis);
+			st.executeUpdate();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try {
+			String aggiornaFatture = "UPDATE scuolacalcio " + 
+					"SET nFattureEmesse = nFattureEmesse+1 " + 
+					"WHERE partitaIva IN (" + 
+					"SELECT scuolacalcio " + 
+					"FROM bambino " + 
+					"WHERE bambino.codFis=?)";
+			PreparedStatement st = con.prepareStatement(aggiornaFatture);
+			st.setString(1, codFis);
+			st.executeUpdate();
+		}
+		catch(Exception e4) {
+			e4.printStackTrace();
+		}
+		
+		//Prendi il progressivo dell'ultima retta e collegalo ad una nuova mensile o annuale
+		int progressivo;
+		try {
+			Statement st = con.createStatement();
+			String sql = "SELECT * FROM retta ORDER BY progressivo DESC";
+			ResultSet rs = st.executeQuery(sql);
+			rs.next();
+			progressivo = rs.getInt(1);
+			
+			if(annuale) {
+				//annuale
+				String creaRetta = "INSERT INTO annuale VALUES(?, ?)";
+				PreparedStatement st1 = con.prepareStatement(creaRetta);
+				st1.setInt(1, progressivo);
+				st1.setInt(2, sconto);
+				st1.executeUpdate();
+			}
+			else {
+				//mensile
+				String creaRetta = "INSERT INTO mensile VALUES(?)";
+				PreparedStatement st1 = con.prepareStatement(creaRetta);
+				st1.setInt(1, progressivo);
+				st1.executeUpdate();
+			}
+		}
+		catch (Exception e2) {
+			e2.getStackTrace();
+		}			
+		
+		
+	}
 	
 }

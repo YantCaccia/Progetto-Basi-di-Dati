@@ -49,7 +49,16 @@ public class StampaPreparatori extends JFrame {
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri " + 
+			String nome = (String)tendina.getSelectedItem();
+			ResultSet rs = executeSQL(con, nome);
+			try {
+				while(rs.next()) {
+					ta.append(rs.getString(1) + " " + rs.getString(2) + " - " + rs.getString(3) + " - Allena poriteri: " + rs.getBoolean(4) + "\n");
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			/*String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri " + 
 					"FROM squadra, prepara, preparatoreAtletico, dipendenti " + 
 					"WHERE squadra.nome=? && prepara.squadra=squadra.nome && "
 					+ "prepara.preparatoreAtletico=preparatoreAtletico.dipendente && dipendenti.codFis=preparatoreAtletico.dipendente";
@@ -63,7 +72,7 @@ public class StampaPreparatori extends JFrame {
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -78,6 +87,21 @@ public class StampaPreparatori extends JFrame {
 		
 	}
 	
-	
+	public static ResultSet executeSQL(Connection con, String nome) {
+		ResultSet rs = null;
+		String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri " + 
+				"FROM squadra, prepara, preparatoreAtletico, dipendenti " + 
+				"WHERE squadra.nome=? && prepara.squadra=squadra.nome && "
+				+ "prepara.preparatoreAtletico=preparatoreAtletico.dipendente && dipendenti.codFis=preparatoreAtletico.dipendente";
+		try {
+			PreparedStatement st1 = con.prepareStatement(cercaBambini);
+			st1.setString(1, nome);
+			rs = st1.executeQuery();
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
+	}
 	
 }
