@@ -1,6 +1,9 @@
 package mainPack;
 import java.awt.GridLayout;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -103,6 +106,61 @@ public class MyFrame extends JFrame {
 		});
 		mainPanel.add(inserisciRetta);
 		
+		JButton inserisciCentro = new JButton("Inserisci Centro Sportivo");
+		inserisciCentro.addActionListener(e->{
+			new InserisciCentroSportivo(con);
+		});
+		mainPanel.add(inserisciCentro);
+		
+		addWindowListener(new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				try {
+					con.close();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		add(mainPanel);
 		setSize(1000, 1000);

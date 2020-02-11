@@ -1,4 +1,4 @@
-package mainPack;
+package framePack;
 
 import java.awt.GridLayout;
 import java.sql.Connection;
@@ -52,8 +52,16 @@ public class StampaNumeroFatture extends JFrame {
 			String str = (String) tendina.getSelectedItem();
 			String[] arr = str.split(" ", 2);
 			String pIva = arr[0];
+			ResultSet rs = executeSQL(con, pIva);
+			try {
+				rs.next();
+				JOptionPane.showMessageDialog(null, (rs.getInt(1)));
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			
 			//Cerco il numero della scuola calcio
-			String cercaScuolaCalcio = "select nFattureEmesse from scuolacalcio where scuolacalcio.partitaIva=?";
+			/*String cercaScuolaCalcio = "select nFattureEmesse from scuolacalcio where scuolacalcio.partitaIva=?";
 			try {
 				PreparedStatement st1 = con.prepareStatement(cercaScuolaCalcio);
 				st1.setString(1, pIva);
@@ -64,7 +72,7 @@ public class StampaNumeroFatture extends JFrame {
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 		});
 		
 		mainPanel.add(sceltaPanel);
@@ -78,7 +86,19 @@ public class StampaNumeroFatture extends JFrame {
 		
 	}
 	
-	
+	public static ResultSet executeSQL(Connection con, String pIva) {
+		ResultSet rs = null;
+		String cercaScuolaCalcio = "select nFattureEmesse from scuolacalcio where scuolacalcio.partitaIva=?";
+		try {
+			PreparedStatement st1 = con.prepareStatement(cercaScuolaCalcio);
+			st1.setString(1, pIva);
+			rs = st1.executeQuery();
+		}
+		catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		return rs;
+	}
 	
 	
 }

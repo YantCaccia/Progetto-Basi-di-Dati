@@ -85,9 +85,11 @@ public class StampaBimbiAllenatore extends JFrame{
 	
 	public static ResultSet executeSQL(Connection con, String nome, String cognome) {
 		ResultSet rs = null;
-		String query = "SELECT COUNT(*) FROM allenatore,dipendenti,squadra,bambino WHERE allenatore.dipendente=dipendenti.codFis &&"
-				+ "squadra.allenatore=allenatore.dipendente &&"
-				+ " bambino.squadra=squadra.nome && dipendenti.nome=? && dipendenti.cognome=?";
+		String query = "select count(*) "
+				+ "from bambino,squadra "
+				+ "where bambino.squadra=squadra.nome && squadra.allenatore in (" 
+				+ "select dipendenti.codFis from allenatore, dipendenti "
+				+ "where allenatore.dipendente = dipendenti.codFis && dipendenti.nome = ? && dipendenti.cognome=?)";
 		try {
 			PreparedStatement st = con.prepareStatement(query);
 			st.setString(1, nome);

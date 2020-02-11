@@ -12,12 +12,10 @@ public class Main {
 
 			String url = "jdbc:mysql://localhost:3306/scuolecalcioDB?serverTimezone=UTC";
 
-			Connection con = DriverManager.getConnection(url, "utente", "password");
+			Connection con = DriverManager.getConnection(url, "userscuolecalcio", "psw");
 			
 			MyFrame mf = new MyFrame(con);
 			mf.setVisible(true);
-
-			//con.close();
 		}
 		catch (Exception e) {
 			System.out.println("Errore:");

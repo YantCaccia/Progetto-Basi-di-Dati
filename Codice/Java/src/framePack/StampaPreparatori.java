@@ -89,7 +89,7 @@ public class StampaPreparatori extends JFrame {
 	
 	public static ResultSet executeSQL(Connection con, String nome) {
 		ResultSet rs = null;
-		String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri " + 
+		String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri  " + 
 				"FROM squadra, prepara, preparatoreAtletico, dipendenti " + 
 				"WHERE squadra.nome=? && prepara.squadra=squadra.nome && "
 				+ "prepara.preparatoreAtletico=preparatoreAtletico.dipendente && dipendenti.codFis=preparatoreAtletico.dipendente";

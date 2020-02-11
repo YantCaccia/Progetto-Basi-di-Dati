@@ -1,4 +1,4 @@
-package mainPack;
+package framePack;
 
 import java.awt.GridLayout;
 import java.sql.Connection;
@@ -59,8 +59,13 @@ public class InserisciRetta extends JFrame {
 			//Ottengo il codiceFisclae del bambino
 			String str = (String) bambino.getSelectedItem();
 			String codFis = str.split(" ", 2)[0];
+			int importo = Integer.parseInt(rettafield.getText());
+			int sconto = Integer.parseInt(scontofield.getText());
+			boolean annuale = true;
+			if(b2.isSelected()) annuale = false;
+			executeSQL(con, codFis, importo, annuale, sconto);
 			//Crea una retta e incrementa numero fatture emesse
-			try {
+			/*try {
 				String creaRetta = "INSERT INTO retta(importo, bambino) VALUES(?, ?)";
 				PreparedStatement st = con.prepareStatement(creaRetta);
 				st.setInt(1, Integer.parseInt(rettafield.getText()));
@@ -110,7 +115,7 @@ public class InserisciRetta extends JFrame {
 			}
 			catch (Exception e2) {
 				e2.getStackTrace();
-			}
+			}*/
 			dispose();
 		});
 		
@@ -124,6 +129,62 @@ public class InserisciRetta extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Inserisci Retta");
+		
+	}
+	
+	public static void executeSQL(Connection con, String codFis, int importo, boolean annuale, int sconto) {
+		
+		try {
+			String creaRetta = "INSERT INTO retta(importo, bambino) VALUES(?, ?)";
+			PreparedStatement st = con.prepareStatement(creaRetta);
+			st.setInt(1, importo);
+			st.setString(2, codFis);
+			st.executeUpdate();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			String aggiornaFatture = "UPDATE scuolacalcio " + 
+					"SET nFattureEmesse = nFattureEmesse+1 " + 
+					"WHERE partitaIva IN (" + 
+					"SELECT scuolacalcio " + 
+					"FROM bambino " + 
+					"WHERE bambino.codFis=?)";
+			PreparedStatement st = con.prepareStatement(aggiornaFatture);
+			st.setString(1, codFis);
+			st.executeUpdate();
+		}
+		catch(Exception e4) {
+			e4.printStackTrace();
+		}
+		//Prendi il progressivo dell'ultima retta e collegalo ad una nuova mensile o annuale
+		int progressivo;
+		try {
+			Statement st = con.createStatement();
+			String sql = "SELECT * FROM retta ORDER BY progressivo DESC";
+			ResultSet rs = st.executeQuery(sql);
+			rs.next();
+			progressivo = rs.getInt(1);
+			
+			if(annuale) {
+				//annuale
+				String creaRetta = "INSERT INTO annuale VALUES(?, ?)";
+				PreparedStatement st1 = con.prepareStatement(creaRetta);
+				st1.setInt(1, progressivo);
+				st1.setInt(2, sconto);
+				st1.executeUpdate();
+			}
+			else {
+				//mensile
+				String creaRetta = "INSERT INTO mensile VALUES(?)";
+				PreparedStatement st1 = con.prepareStatement(creaRetta);
+				st1.setInt(1, progressivo);
+				st1.executeUpdate();
+			}
+		}
+		catch (Exception e2) {
+			e2.getStackTrace();
+		}
 		
 	}
 
