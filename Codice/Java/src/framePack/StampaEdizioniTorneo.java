@@ -11,27 +11,28 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
-public class StampaEntrate extends JFrame{
+public class StampaEdizioniTorneo extends JFrame {
 
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1477804982367800803L;
+	private static final long serialVersionUID = 7013729425827524682L;
 
-	public StampaEntrate(Connection con) {
+	public StampaEdizioniTorneo(Connection con) {
 		
-		JPanel mainPanel = new JPanel(new GridLayout(2,1));
+		JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		
 		JPanel sceltaPanel = new JPanel(new GridLayout(2,1));
 		
-		JLabel sceltaLabel = new JLabel("Scegli scuola calcio:");
+		JLabel sceltaLabel = new JLabel("Scegli torneo:");
 		sceltaPanel.add(sceltaLabel);
 		
 		JComboBox<String> tendina = new JComboBox<String>();
-		String sql2 = " SELECT nome FROM scuolacalcio";
+		String sql2 = " SELECT DISTINCT nome FROM torneo";
 		try {
 			Statement st = con.createStatement();
 			ResultSet rs = st.executeQuery(sql2);
@@ -43,26 +44,28 @@ public class StampaEntrate extends JFrame{
 		}
 		sceltaPanel.add(tendina);
 		
+		JTextArea ta = new JTextArea();
+		
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
+			ta.setText("");
 			String nome = (String)tendina.getSelectedItem();
 			ResultSet rs = executeSQL(con, nome);
 			try {
-				rs.next();
-				JOptionPane.showMessageDialog(null, "Entrate: " + Integer.toString(rs.getInt(1)) + "$");
+				while(rs.next()) {
+					ta.append(rs.getInt(1) + " - " + rs.getString(2) + "\n");
+				}
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			/*String creaDip = "SELECT SUM(importo) " + 
-					"FROM scuolacalcio, bambino, retta " + 
-					"WHERE scuolacalcio.partitaIva=bambino.scuolacalcio && retta.bambino=bambino.codFis && scuolacalcio.nome=?";
+			/*String cercaBambini = "select edizione, squadra from torneo where torneo.nome=?";
 			try {
-				PreparedStatement st1 = con.prepareStatement(creaDip);
+				PreparedStatement st1 = con.prepareStatement(cercaBambini);
 				st1.setString(1, (String)tendina.getSelectedItem());
 				ResultSet rs = st1.executeQuery();
-				rs.next();
-				JOptionPane.showMessageDialog(null, "Entrate: " + Integer.toString(rs.getInt(1)) + "$");
+				while(rs.next()) {
+					ta.append(rs.getInt(1) + " - " + rs.getString(2) + "\n");
+				}
 			}
 			catch(Exception e1) {
 				e1.printStackTrace();
@@ -70,23 +73,22 @@ public class StampaEntrate extends JFrame{
 		});
 		
 		mainPanel.add(sceltaPanel);
+		mainPanel.add(ta);
 		mainPanel.add(ok);
 		
 		add(mainPanel);
 		setSize(400,400);
 		setVisible(true);
-		setTitle("Stampa Entrate");
+		setTitle("Stampa edizioni torneo");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	
 	public static ResultSet executeSQL(Connection con, String nome) {
 		ResultSet rs = null;
-		String creaDip = "SELECT SUM(importo) " + 
-				"FROM scuolacalcio, bambino, retta " + 
-				"WHERE scuolacalcio.partitaIva=bambino.scuolacalcio && retta.bambino=bambino.codFis && scuolacalcio.nome=?";
+		String cercaBambini = "select edizione, squadra from torneo where torneo.nome=?";
 		try {
-			PreparedStatement st1 = con.prepareStatement(creaDip);
+			PreparedStatement st1 = con.prepareStatement(cercaBambini);
 			st1.setString(1, nome);
 			rs = st1.executeQuery();
 		}
@@ -95,5 +97,6 @@ public class StampaEntrate extends JFrame{
 		}
 		return rs;
 	}
+	
 	
 }

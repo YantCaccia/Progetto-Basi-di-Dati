@@ -9,60 +9,35 @@ import java.sql.Statement;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-public class IscriviBambinoFrame extends JFrame{
-
+public class InserisciRetta extends JFrame {
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7828239879578366643L;
+	private static final long serialVersionUID = 7811712427411216L;
 
-	public IscriviBambinoFrame(Connection con) {
+	public InserisciRetta(Connection con) {
 		
-		JPanel mainPanel = new JPanel(new GridLayout(7,1));
+		JPanel mainpanel = new JPanel(new GridLayout(5,1));
 		
-		JPanel codfispanel = new JPanel(new GridLayout(2,1));
-		JLabel codfislabel = new JLabel("Codice Fiscale");
-		JTextField codfisfield = new JTextField();
-		codfispanel.add(codfislabel);
-		codfispanel.add(codfisfield);
-		mainPanel.add(codfispanel);
-		
-		JPanel nomepanel = new JPanel(new GridLayout(2,1));
-		JLabel nomelabel = new JLabel("Nome");
-		JTextField nomefield = new JTextField();
-		nomepanel.add(nomelabel);
-		nomepanel.add(nomefield);
-		mainPanel.add(nomepanel);
-		
-		JPanel etapanel = new JPanel(new GridLayout(2,1));
-		JLabel etalabel = new JLabel("Eta'");
-		JTextField etafield = new JTextField();
-		etapanel.add(etalabel);
-		etapanel.add(etafield);
-		mainPanel.add(etapanel);
-		
-		JPanel scpanel = new JPanel(new GridLayout(2,1));
-		JLabel sclabel = new JLabel("Scuola Calcio");
-		JTextField scfield = new JTextField();
-		scpanel.add(sclabel);
-		scpanel.add(scfield);
-		mainPanel.add(scpanel);
-		
-		JPanel sqpanel = new JPanel(new GridLayout(2,1));
-		JLabel sqlabel = new JLabel("Squadra");
-		JTextField sqfield = new JTextField();
-		sqpanel.add(sqlabel);
-		sqpanel.add(sqfield);
-		mainPanel.add(sqpanel);
-		
-		JPanel rettapanel = new JPanel(new GridLayout(4,1));
-		JLabel rettalabel = new JLabel("Retta");
+		JComboBox<String> bambino = new JComboBox<String>();
+		String sql2 = " SELECT codFis, nome FROM bambino";
+		try {
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery(sql2);
+			while(rs.next()) {
+				bambino.addItem(rs.getString(1) + " - " + rs.getString(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		mainpanel.add(bambino);
 		
 		JPanel sceltapanel = new JPanel(new GridLayout(1,2));
 		ButtonGroup bg = new ButtonGroup();
@@ -79,66 +54,26 @@ public class IscriviBambinoFrame extends JFrame{
 		JTextField scontofield = new JTextField();
 		scontofield.setText("Sconto (se retta mensile viene ignorato)");
 		
-		rettapanel.add(rettalabel);
-		rettapanel.add(sceltapanel);
-		rettapanel.add(rettafield);
-		rettapanel.add(scontofield);
-		mainPanel.add(rettapanel);
-		
 		JButton okButton = new JButton("Ok");
 		okButton.addActionListener(e->{
-			String nome = nomefield.getText();
-			String codFis = codfisfield.getText();
-			int eta = Integer.parseInt(etafield.getText());
-			String squadra = sqfield.getText();
-			String scuolacalcio = scfield.getText();
-			int importoRetta = Integer.parseInt(rettafield.getText());
+			//Ottengo il codiceFisclae del bambino
+			String str = (String) bambino.getSelectedItem();
+			String codFis = str.split(" ", 2)[0];
+			int importo = Integer.parseInt(rettafield.getText());
+			int sconto = Integer.parseInt(scontofield.getText());
 			boolean annuale = true;
 			if(b2.isSelected()) annuale = false;
-			int sconto = Integer.parseInt(scontofield.getText());
-			String pIva = null;
-			//Abbiamo il nome della scuola calcio, ma ci serve la partita Iva. Prendiamola:
-			/**/
-			try {
-				String cercaSc = "SELECT partitaIva FROM scuolacalcio WHERE nome = ?";
-				PreparedStatement st = con.prepareStatement(cercaSc);
-				st.setString(1, scuolacalcio);
-				ResultSet rs = st.executeQuery();
-				rs.next();
-				pIva = rs.getString("partitaIva");
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			executeSQL(con, codFis, nome, eta, pIva, squadra, importoRetta, sconto, annuale);
-			
-			/*
-			try {
-				String creaBimbo = "INSERT INTO bambino VALUES(?, ?, ?, ?, ?)";
-				PreparedStatement st = con.prepareStatement(creaBimbo);
-				st.setString(1, codFis);
-				st.setString(2, nome);
-				st.setInt(3, eta);
-				st.setString(4, pIva);
-				st.setString(5, squadra);
-				st.executeUpdate();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
+			executeSQL(con, codFis, importo, annuale, sconto);
 			//Crea una retta e incrementa numero fatture emesse
-			try {
+			/*try {
 				String creaRetta = "INSERT INTO retta(importo, bambino) VALUES(?, ?)";
 				PreparedStatement st = con.prepareStatement(creaRetta);
 				st.setInt(1, Integer.parseInt(rettafield.getText()));
 				st.setString(2, codFis);
 				st.executeUpdate();
 			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
 			try {
 				String aggiornaFatture = "UPDATE scuolacalcio " + 
 						"SET nFattureEmesse = nFattureEmesse+1 " + 
@@ -153,7 +88,6 @@ public class IscriviBambinoFrame extends JFrame{
 			catch(Exception e4) {
 				e4.printStackTrace();
 			}
-			
 			//Prendi il progressivo dell'ultima retta e collegalo ad una nuova mensile o annuale
 			int progressivo;
 			try {
@@ -184,44 +118,31 @@ public class IscriviBambinoFrame extends JFrame{
 			}*/
 			dispose();
 		});
-		mainPanel.add(okButton);
 		
-		add(mainPanel);
+		mainpanel.add(sceltapanel);
+		mainpanel.add(rettafield);
+		mainpanel.add(scontofield);
+		mainpanel.add(okButton);
+		
+		add(mainpanel);
+		setSize(400,400);
 		setVisible(true);
-		setSize(600,600);
-		setTitle("Iscrivi Bambino");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("Inserisci Retta");
 		
 	}
 	
-	public static void executeSQL(Connection con, String codFis, String nome, int eta, String pIva, String squadra, int importoRetta, int sconto, boolean annuale) {
+	public static void executeSQL(Connection con, String codFis, int importo, boolean annuale, int sconto) {
 		
-		try {
-			String creaBimbo = "INSERT INTO bambino VALUES(?, ?, ?, ?, ?)";
-			PreparedStatement st = con.prepareStatement(creaBimbo);
-			st.setString(1, codFis);
-			st.setString(2, nome);
-			st.setInt(3, eta);
-			st.setString(4, pIva);
-			st.setString(5, squadra);
-			st.executeUpdate();
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		//Crea una retta e incrementa numero fatture emesse
 		try {
 			String creaRetta = "INSERT INTO retta(importo, bambino) VALUES(?, ?)";
 			PreparedStatement st = con.prepareStatement(creaRetta);
-			st.setInt(1, importoRetta);
+			st.setInt(1, importo);
 			st.setString(2, codFis);
 			st.executeUpdate();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
 		try {
 			String aggiornaFatture = "UPDATE scuolacalcio " + 
 					"SET nFattureEmesse = nFattureEmesse+1 " + 
@@ -236,7 +157,6 @@ public class IscriviBambinoFrame extends JFrame{
 		catch(Exception e4) {
 			e4.printStackTrace();
 		}
-		
 		//Prendi il progressivo dell'ultima retta e collegalo ad una nuova mensile o annuale
 		int progressivo;
 		try {
@@ -264,9 +184,8 @@ public class IscriviBambinoFrame extends JFrame{
 		}
 		catch (Exception e2) {
 			e2.getStackTrace();
-		}			
-		
+		}
 		
 	}
-	
+
 }

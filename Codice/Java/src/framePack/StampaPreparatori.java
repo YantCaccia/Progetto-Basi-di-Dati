@@ -14,14 +14,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class StampaBimbiSquadra extends JFrame{
+public class StampaPreparatori extends JFrame {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4814082018157684136L;
+	private static final long serialVersionUID = -1207388961585036759L;
 
-	public StampaBimbiSquadra(Connection con) {
+	
+	public StampaPreparatori(Connection con) {
 		
 		JPanel mainPanel = new JPanel(new GridLayout(3,1));
 		
@@ -48,24 +49,25 @@ public class StampaBimbiSquadra extends JFrame{
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
 			ta.setText("");
-			String squadra = (String)tendina.getSelectedItem();
-			ResultSet rs = executeSQL(con, squadra);
+			String nome = (String)tendina.getSelectedItem();
+			ResultSet rs = executeSQL(con, nome);
 			try {
 				while(rs.next()) {
-					ta.append(rs.getString(1) + " " + rs.getInt(2) + "\n");
+					ta.append(rs.getString(1) + " " + rs.getString(2) + " - " + rs.getString(3) + " - Allena poriteri: " + rs.getBoolean(4) + "\n");
 				}
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
-			/*String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
-					"FROM squadra, bambino " + 
-					"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
+			/*String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri " + 
+					"FROM squadra, prepara, preparatoreAtletico, dipendenti " + 
+					"WHERE squadra.nome=? && prepara.squadra=squadra.nome && "
+					+ "prepara.preparatoreAtletico=preparatoreAtletico.dipendente && dipendenti.codFis=preparatoreAtletico.dipendente";
 			try {
 				PreparedStatement st1 = con.prepareStatement(cercaBambini);
 				st1.setString(1, (String)tendina.getSelectedItem());
 				ResultSet rs = st1.executeQuery();
 				while(rs.next()) {
-					ta.append(rs.getString(1) + " " + rs.getInt(2) + "\n");
+					ta.append(rs.getString(1) + " " + rs.getString(2) + " - " + rs.getString(3) + " - Allena poriteri: " + rs.getBoolean(4) + "\n");
 				}
 			}
 			catch(Exception e1) {
@@ -78,21 +80,22 @@ public class StampaBimbiSquadra extends JFrame{
 		mainPanel.add(ok);
 		
 		add(mainPanel);
-		setSize(400,400);
+		setSize(600,500);
 		setVisible(true);
 		setTitle("Stampa bimbi di una squadra");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	
-	public static ResultSet executeSQL(Connection con, String squadra) {
+	public static ResultSet executeSQL(Connection con, String nome) {
 		ResultSet rs = null;
-		String cercaBambini = "SELECT bambino.nome, bambino.eta " + 
-				"FROM squadra, bambino " + 
-				"WHERE bambino.squadra=squadra.nome && squadra.nome=?";
+		String cercaBambini = "SELECT dipendenti.nome, dipendenti.cognome, dipendenti.codFis, preparatoreAtletico.allenaPortieri  " + 
+				"FROM squadra, prepara, preparatoreAtletico, dipendenti " + 
+				"WHERE squadra.nome=? && prepara.squadra=squadra.nome && "
+				+ "prepara.preparatoreAtletico=preparatoreAtletico.dipendente && dipendenti.codFis=preparatoreAtletico.dipendente";
 		try {
 			PreparedStatement st1 = con.prepareStatement(cercaBambini);
-			st1.setString(1, squadra);
+			st1.setString(1, nome);
 			rs = st1.executeQuery();
 		}
 		catch(Exception e1) {
@@ -100,4 +103,5 @@ public class StampaBimbiSquadra extends JFrame{
 		}
 		return rs;
 	}
+	
 }

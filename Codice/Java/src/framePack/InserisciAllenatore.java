@@ -79,7 +79,13 @@ public class InserisciAllenatore extends JFrame {
 				st.setString(1, (String)scalcio.getSelectedItem());
 				ResultSet rs = st.executeQuery();
 				rs.next();
-				String codFisPres = rs.getString(1);				
+				String codFisPres = rs.getString(1);
+				String codFis = codfisfield.getText();
+				String nome = nomefield.getText();
+				String cognome = cognfield.getText();
+				String nomeSquadra = (String)tendina.getSelectedItem();
+				executeSQL(con, codFis, nome, cognome, codFisPres, nomeSquadra);
+				/*
 				//Creo il nuovo dipendente
 				String creaDip = "INSERT INTO dipendenti VALUES(?, ?, ?, ?)";
 				PreparedStatement st1 = con.prepareStatement(creaDip);
@@ -100,11 +106,10 @@ public class InserisciAllenatore extends JFrame {
 				PreparedStatement st3 = con.prepareStatement(cambiaSquadra);
 				st3.setString(1, codfisfield.getText());
 				st3.setString(2, (String)tendina.getSelectedItem());
-				st3.executeUpdate();
+				st3.executeUpdate();*/
 			} catch (SQLException e1) {
 				e1.printStackTrace();
-			}
-						
+			}	
 			dispose();
 		});
 		mainPanel.add(okButton);
@@ -112,8 +117,8 @@ public class InserisciAllenatore extends JFrame {
 		add(mainPanel);
 		setVisible(true);
 		setSize(600,600);
-		setTitle("Iscrivi Bambino");
-				
+		setTitle("Inserisci Allenatore");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	
@@ -133,6 +138,34 @@ public class InserisciAllenatore extends JFrame {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public static void executeSQL(Connection con, String codFis, String nome, String cognome, String codFisPres, String nomeSquadra) {				
+		try {
+			//Creo il nuovo dipendente
+			String creaDip = "INSERT INTO dipendenti VALUES(?, ?, ?, ?)";
+			PreparedStatement st1 = con.prepareStatement(creaDip);
+			st1.setString(1, codFis);
+			st1.setString(2, nome);
+			st1.setString(3, cognome);
+			st1.setString(4, codFisPres);
+			st1.executeUpdate();
+			//Creo l'allenatore
+			String creaAll = "INSERT INTO allenatore VALUES(?)";
+			PreparedStatement st2 = con.prepareStatement(creaAll);
+			st2.setString(1, codFis);
+			st2.executeUpdate();
+			//Lo assegno alla squadra
+			String cambiaSquadra = "UPDATE squadra " + 
+					"SET allenatore=? " + 
+					"WHERE nome=?";
+			PreparedStatement st3 = con.prepareStatement(cambiaSquadra);
+			st3.setString(1, codFis);
+			st3.setString(2, nomeSquadra);
+			st3.executeUpdate();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
 	}
 

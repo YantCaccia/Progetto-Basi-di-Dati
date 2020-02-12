@@ -10,8 +10,8 @@ import java.sql.Statement;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 public class StampaBimbiAllenatore extends JFrame{
 
@@ -22,11 +22,9 @@ public class StampaBimbiAllenatore extends JFrame{
 
 	public StampaBimbiAllenatore(Connection con) {
 		
-		JPanel mainPanel = new JPanel(new GridLayout(3,1));
+		JPanel mainPanel = new JPanel(new GridLayout(2,1));
 		
 		JComboBox<String> tendina = new JComboBox<String>();
-		
-		JTextArea ta = new JTextArea();
 		
 		//Per aggiungere i nomi degli allenatori alla tendina
 		String sql = " SELECT nome,cognome FROM allenatore,dipendenti WHERE allenatore.dipendente=dipendenti.codFis";
@@ -51,34 +49,57 @@ public class StampaBimbiAllenatore extends JFrame{
 			String[] arr = nomecognome.split(" ", 2);
 			String nome = arr[0];
 			String cognome = arr[1];
-			
-			String query = "SELECT COUNT(*) FROM allenatore,dipendenti,squadra,bambino WHERE allenatore.dipendente=dipendenti.codFis &&"
+			ResultSet rs = executeSQL(con, nome, cognome);
+			try {
+				rs.next();
+				JOptionPane.showMessageDialog(null, (Integer.toString(rs.getInt(1))));
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			/*String query = "SELECT COUNT(*) FROM allenatore,dipendenti,squadra,bambino WHERE allenatore.dipendente=dipendenti.codFis &&"
 					+ "squadra.allenatore=allenatore.dipendente &&"
 					+ " bambino.squadra=squadra.nome && dipendenti.nome=? && dipendenti.cognome=?";
-			
 			try {
 				PreparedStatement st = con.prepareStatement(query);
 				st.setString(1, nome);
 				st.setString(2, cognome);
 				ResultSet rs = st.executeQuery();
 				rs.next();
-				ta.setText(Integer.toString(rs.getInt(1)));
+				JOptionPane.showMessageDialog(null, (Integer.toString(rs.getInt(1))));
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 			
 		});
-		
-		
+			
 		mainPanel.add(tendina);
-		mainPanel.add(ta);
 		mainPanel.add(ok);
 		add(mainPanel);
 		setTitle("Stampa numero bambini");
 		setSize(500,500);
 		setVisible(true);
-		
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	
+	}
+	
+	public static ResultSet executeSQL(Connection con, String nome, String cognome) {
+		ResultSet rs = null;
+		String query = "select count(*) "
+				+ "from bambino,squadra "
+				+ "where bambino.squadra=squadra.nome && squadra.allenatore in (" 
+				+ "select dipendenti.codFis from allenatore, dipendenti "
+				+ "where allenatore.dipendente = dipendenti.codFis && dipendenti.nome = ? && dipendenti.cognome=?)";
+		try {
+			PreparedStatement st = con.prepareStatement(query);
+			st.setString(1, nome);
+			st.setString(2, cognome);
+			rs = st.executeQuery();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return rs;
 	}
 	
 }

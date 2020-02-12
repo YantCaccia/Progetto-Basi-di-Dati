@@ -54,6 +54,8 @@ public class InserisciMedico extends JFrame{
 		
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(e->{
+			String nome = nomeField.getText();
+			String codFis = codfisField.getText();
 			//Troviamo la pIva della scuola calcio
 			String pIva = null;
 			try {
@@ -66,8 +68,9 @@ public class InserisciMedico extends JFrame{
 			} catch(Exception e1) {
 				e1.printStackTrace();
 			}
+			executeSQL(con, nome, codFis, pIva);
 			//Ora creiamo il medico
-			try {
+			/*try {
 				String creaMed = "INSERT INTO medicoSportivo VALUES(?,?)";
 				PreparedStatement st1 = con.prepareStatement(creaMed);
 				st1.setString(1, nomeField.getText());
@@ -85,18 +88,41 @@ public class InserisciMedico extends JFrame{
 				st1.executeUpdate();
 			} catch(Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 			dispose();
 		});
 		mainPanel.add(ok);
 		
-		
 		add(mainPanel);
 		setVisible(true);
 		setSize(400,400);
+		setTitle("Insersci Medico");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
 	
+	public static void executeSQL(Connection con, String nome, String codFis, String pIva) {
+		//Creaimo il medico
+		try {
+			String creaMed = "INSERT INTO medicoSportivo VALUES(?,?)";
+			PreparedStatement st1 = con.prepareStatement(creaMed);
+			st1.setString(1, nome);
+			st1.setString(2, codFis);
+			st1.executeUpdate();
+		} catch(Exception e1) {
+			e1.printStackTrace();
+		}
+		//Ora colleghiamo il medico alla squadra
+		try {
+			String creaCollabora = "INSERT INTO collabora VALUES (?,?)";
+			PreparedStatement st1 = con.prepareStatement(creaCollabora);
+			st1.setString(1, pIva);
+			st1.setString(2, codFis);
+			st1.executeUpdate();
+		} catch(Exception e1) {
+			e1.printStackTrace();
+		}
 	
+	}
 	
 }
