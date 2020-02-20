@@ -24,7 +24,7 @@ public class MyFrame extends JFrame {
 		
 		JButton iscriviBambinoButton = new JButton("Iscrivi Bambino");
 		iscriviBambinoButton.addActionListener(e->{
-			new IscriviBambinoFrame(con);
+			new IscriviBambino(con);
 		});
 		mainPanel.add(iscriviBambinoButton);
 		

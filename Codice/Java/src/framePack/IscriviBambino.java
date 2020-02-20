@@ -15,14 +15,14 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-public class IscriviBambinoFrame extends JFrame{
+public class IscriviBambino extends JFrame{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7828239879578366643L;
 
-	public IscriviBambinoFrame(Connection con) {
+	public IscriviBambino(Connection con) {
 		
 		JPanel mainPanel = new JPanel(new GridLayout(7,1));
 		

@@ -59,7 +59,7 @@ public class Tester {
 			
 			System.out.println("Inseriamo un bambino con i seguenti parametri:\n"
 					+ "Alessandro de Rosa - 10 anni - nella squadra Juniores Recca della scuola calcio 77253160640");
-			IscriviBambinoFrame.executeSQL(con, "DRSLSS05A01F839T", "Alessandro De Rosa", 10, "77253160640", "Juniores Recca", 50, 0, false);
+			IscriviBambino.executeSQL(con, "DRSLSS05A01F839T", "Alessandro De Rosa", 10, "77253160640", "Juniores Recca", 50, 0, false);
 			DBTablePrinter.printTable(con, "bambino");
 			
 			System.out.println("Testiamo la stampa del numero di bambini dell'allenatore Luigi Di Maio");
