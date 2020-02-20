@@ -82,7 +82,7 @@ public class StampaPreparatori extends JFrame {
 		add(mainPanel);
 		setSize(600,500);
 		setVisible(true);
-		setTitle("Stampa bimbi di una squadra");
+		setTitle("Stampa preparatori di una squadra");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 	}
